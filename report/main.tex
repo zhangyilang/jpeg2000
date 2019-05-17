@@ -1,0 +1,47 @@
+\documentclass{fduthesis}
+
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\graphicspath{{figures/}{}}
+
+\renewcommand\thesection{\arabic{section}} 
+\renewcommand {\thetable} {\thesection{}.\arabic{table}}
+\renewcommand {\thefigure} {\thesection{}.\arabic{figure}}
+
+\fdusetup{
+  style = {
+    font-size = 5,
+    fullwidth-stop = catcode,
+    auto-make-cover = false}
+}
+
+\title{信息论 project\\JPEG2000}
+\author{高云帆 15307130314\\张奕朗 16307130242\\陈幸豪}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\input{beginning}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\input{tiling}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\input{wavelet}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\input{EBCOT}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\input{arithmeticCoding}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\input{bitGenerate}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\input{result}
+\input{reference}
+\end{document}

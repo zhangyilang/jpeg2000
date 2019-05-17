@@ -1,0 +1,38 @@
+\section{图像分块与电平平移归一化}
+
+在图像变换之前，首先需要对图像进行预处理。预处理主要分为分块、电平平移归一化和颜色变换三个过程（\textbf{图\ref{fig1}}）。在调用\textit{cv2.imread}读取图像数据时，利用正则表达式获取图像的颜色位数信息，方便之后的处理。\textit{代码见函数init\_image。}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.4]{fig1}
+	\caption{图像预处理.}
+	\label{fig1}
+\end{figure}
+
+\subsection{图像分块}
+与JPEG标准相同，JPEG2000标准也需要将图像分块，不过是为了降低计算量和对内存的需求，以方便压缩（当然也可以选择不分块）。但与JPEG标准不同的是，JPEG2000标准并不需要将图像强制分成$8\times 8$的小块,而是可以将图像分割成若干任意大小的互不重叠的矩形块(tile),常分为$2 ^6\sim 2^{12}$（即$64\sim 1024$像素宽）的正方形tile。受图像形状的影响，边缘部分的tile的大小和形状可能与其它的tile不同。Tile的大小会影响重构图像的质量。一般情况下，大的tile重构出的图像质量要好一些，因为小波变换的范围大，减轻了边缘效应。\textit{代码见class Tile和class JPEG2000中的函数image\_tiling。} \par
+
+\subsection{电平平移归一化}
+电平平移归一化分为两步：\par
+第一步是直流电平平移（DC level shifting），通过将数据减去均值使之关于0对称分布，以去掉频谱中的直流分量。
+\[
+\begin{aligned}
+I_1(x,y)=I(x,y)-2^{B-1}\\
+-2^{B-1}\le I_1(x,y)\le 2^{B-1}-1
+\end{aligned}
+\]
+其中B是之前读取到的颜色位数信息。\par
+第二步是电平归一化（normaliztion）。对于无损压缩中的5/3小波变换，由于采用的是整数小波变换，所以不需要进行归一化；而对于有损压缩中的9/7小波变换，由于采用的是实数小波变换，故需要对每个tile进行如下运算以归一化：\par
+\[
+\begin{aligned}
+I_2(x,y)=\frac{I_1(x,y)}{2^{B}}\\
+-\frac{1}{2}\le I_2(x,y)<\frac{1}{2}
+\end{aligned}
+\]
+但是事实上，电平平移归一化对DWT来说不是必须的（而且电平平移归一化后还不便于进行色彩空间变换），因为它只会影响小波系数的动态范围而不会影响结果。\textit{代码见函数dc\_level\_shift。}
+
+\subsection{反变换}
+在解码、小波反变换和色彩空间反变换之后，需要进行电平反平移，（如果是有损压缩，还需要进行反归一化），最后拼接得到恢复的图像。这些都是上述操作的反过程，这里不再赘述。\textit{代码见函数idc\_level\_shift和image\_splicing。}
+
+
+
